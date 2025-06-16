@@ -1,1 +1,0 @@
-module snp_scrapper
