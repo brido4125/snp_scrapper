@@ -16,16 +16,8 @@ type StockService struct {
 	openaiClient *openai.Client
 }
 
-// Store defines the interface for storage operations
-type Store interface {
-	SaveStockList(ctx context.Context, stockList *models.StockList) error
-	GetStockList(ctx context.Context) (*models.StockList, error)
-	AddSubscriber(ctx context.Context, email string) error
-	GetSubscribers(ctx context.Context) ([]string, error)
-}
-
 // NewStockService creates a new stock service
-func NewStockService(store Store, openaiClient *openai.Client) *StockService {
+func NewStockService(store store.Store, openaiClient *openai.Client) *StockService {
 	return &StockService{
 		store:       store,
 		openaiClient: openaiClient,
@@ -35,7 +27,7 @@ func NewStockService(store Store, openaiClient *openai.Client) *StockService {
 // UpdateStockList updates the S&P 500 stock list
 func (s *StockService) UpdateStockList(ctx context.Context) error {
 	prompt := "List all current S&P 500 companies with their ticker symbols and market cap as of today."
-	resp, err := s.openaiClient.CreateChatCompletion(
+	_ , err := s.openaiClient.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
 			Model: openai.GPT4,

@@ -1,6 +1,7 @@
 package store
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 
@@ -48,7 +49,7 @@ func (s *AWSStore) SaveStockList(ctx context.Context, stockList *models.StockLis
 	_, err = s.s3Client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(s.bucket),
 		Key:         aws.String("stocks.json"),
-		Body:        aws.NewReadSeekCloser(aws.NewReader(data)),
+		Body:        bytes.NewReader(data),
 		ContentType: aws.String("application/json"),
 	})
 	if err != nil {
@@ -112,7 +113,7 @@ func (s *AWSStore) GetSubscribers(ctx context.Context) ([]string, error) {
 
 	subscribers := make([]string, 0, len(result.Subscriptions))
 	for _, sub := range result.Subscriptions {
-		if sub.Protocol == "email" {
+		if sub.Protocol != nil && *sub.Protocol == "email" {
 			subscribers = append(subscribers, *sub.Endpoint)
 		}
 	}
